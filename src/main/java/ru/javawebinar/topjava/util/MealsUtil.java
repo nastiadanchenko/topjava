@@ -42,7 +42,7 @@ public class MealsUtil {
 
 // Optional2 recursion
         System.out.println(filteredByRecursion(meals, startTime, endTime, 2000));
-        System.out.println(filteredBySetterRecursion(meals, startTime, endTime, 2000));
+//        System.out.println(filteredBySetterRecursion(meals, startTime, endTime, 2000));
 
 //  Optional2 reference type
 //        System.out.println(filteredByAtomic(meals, startTime, endTime, 2000));  // or Boolean[1]
@@ -50,39 +50,39 @@ public class MealsUtil {
 
 //   Optional2 delayed execution
 //      System.out.println(filteredByClosure(meals, startTime, endTime, 2000));
-        System.out.println(filteredByExecutor(meals, startTime, endTime, 2000));
-        System.out.println(filteredByLock(meals, startTime, endTime, 2000));
-        System.out.println(filteredByCountDownLatch(meals, startTime, endTime, 2000));
-        System.out.println(filteredByPredicate(meals, startTime, endTime, 2000));
-        System.out.println(filteredByConsumerChain(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByExecutor(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByLock(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByCountDownLatch(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByPredicate(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByConsumerChain(meals, startTime, endTime, 2000));
 
 //   Optional2 streams
-        System.out.println(filteredByFlatMap(meals, startTime, endTime, 2000));
-        System.out.println(filteredByCollector(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByFlatMap(meals, startTime, endTime, 2000));
+//        System.out.println(filteredByCollector(meals, startTime, endTime, 2000));
     }
 
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(
-                        Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
+                        Collectors.groupingBy(m->m.getDateTime().toLocalDate(), Collectors.summingInt(Meal::getCalories))
 //                      Collectors.toMap(Meal::getDate, Meal::getCalories, Integer::sum)
                 );
 
         return meals.stream()
-                .filter(meal -> isBetweenHalfOpen(meal.getTime(), startTime, endTime))
-                .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
+                .filter(meal -> isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
+                .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDateTime().toLocalDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
     }
 
     public static List<MealTo> filteredByCycles(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
 
         final Map<LocalDate, Integer> caloriesSumByDate = new HashMap<>();
-        meals.forEach(meal -> caloriesSumByDate.merge(meal.getDate(), meal.getCalories(), Integer::sum));
+        meals.forEach(meal -> caloriesSumByDate.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum));
 
         final List<MealTo> mealsTo = new ArrayList<>();
         meals.forEach(meal -> {
-            if (isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
-                mealsTo.add(createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay));
+            if (isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
+                mealsTo.add(createTo(meal, caloriesSumByDate.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
             }
         });
         return mealsTo;
@@ -99,13 +99,14 @@ public class MealsUtil {
         if (meals.isEmpty()) return;
 
         Meal meal = meals.pop();
-        dailyCaloriesMap.merge(meal.getDate(), meal.getCalories(), Integer::sum);
+        dailyCaloriesMap.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum);
         filterWithRecursion(meals, startTime, endTime, caloriesPerDay, dailyCaloriesMap, result);
-        if (isBetweenHalfOpen(meal.getTime(), startTime, endTime)) {
-            result.add(createTo(meal, dailyCaloriesMap.get(meal.getDate()) > caloriesPerDay));
+        if (isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
+            result.add(createTo(meal, dailyCaloriesMap.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
         }
     }
 
+/*
     private static List<MealTo> filteredBySetterRecursion(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         class MealNode {
             private final MealNode prev;
@@ -148,6 +149,7 @@ public class MealsUtil {
         });
         return mealsTo;
     }
+*/
 
     /*
         private static List<MealTo> filteredByAtomic(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -202,7 +204,7 @@ public class MealsUtil {
         }
     */
 
-    private static List<MealTo> filteredByExecutor(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) throws InterruptedException, ExecutionException {
+  /*  private static List<MealTo> filteredByExecutor(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) throws InterruptedException, ExecutionException {
         Map<LocalDate, Integer> caloriesSumByDate = new HashMap<>();
         List<Callable<Void>> tasks = new ArrayList<>();
         final List<MealTo> mealsTo = Collections.synchronizedList(new ArrayList<>());
@@ -220,9 +222,9 @@ public class MealsUtil {
         executorService.invokeAll(tasks);
         executorService.shutdown();
         return mealsTo;
-    }
+    }*/
 
-    public static List<MealTo> filteredByLock(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) throws InterruptedException {
+    /*public static List<MealTo> filteredByLock(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) throws InterruptedException {
         Map<LocalDate, Integer> caloriesSumByDate = new HashMap<>();
         List<MealTo> mealsTo = new ArrayList<>();
         ExecutorService executor = Executors.newCachedThreadPool();
@@ -268,8 +270,8 @@ public class MealsUtil {
         latchTasks.await();
         return mealsTo;
     }
-
-    public static List<MealTo> filteredByPredicate(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+*/
+  /*  public static List<MealTo> filteredByPredicate(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesSumByDate = new HashMap<>();
         List<MealTo> mealsTo = new ArrayList<>();
 
@@ -283,8 +285,8 @@ public class MealsUtil {
         predicate.test(true);
         return mealsTo;
     }
-
-    public static List<MealTo> filteredByConsumerChain(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+*/
+    /*public static List<MealTo> filteredByConsumerChain(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesPerDays = new HashMap<>();
         List<MealTo> result = new ArrayList<>();
         Consumer<Void> consumer = dummy -> {};
@@ -298,8 +300,8 @@ public class MealsUtil {
         consumer.accept(null);
         return result;
     }
-
-    private static List<MealTo> filteredByFlatMap(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+*/
+   /* private static List<MealTo> filteredByFlatMap(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Collection<List<Meal>> list = meals.stream()
                 .collect(Collectors.groupingBy(Meal::getDate)).values();
 
@@ -311,8 +313,8 @@ public class MealsUtil {
                             .map(meal -> createTo(meal, excess));
                 }).collect(toList());
     }
-
-    private static List<MealTo> filteredByCollector(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+*/
+   /* private static List<MealTo> filteredByCollector(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         final class Aggregate {
             private final List<Meal> dailyMeals = new ArrayList<>();
             private int dailySumOfCalories;
@@ -344,7 +346,7 @@ public class MealsUtil {
 
         return values.stream().flatMap(identity()).collect(toList());
     }
-
+*/
     private static MealTo createTo(Meal meal, boolean excess) {
         return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
