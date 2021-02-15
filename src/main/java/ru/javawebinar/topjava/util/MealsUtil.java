@@ -9,39 +9,34 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 import static ru.javawebinar.topjava.util.TimeUtil.isBetweenHalfOpen;
 
 public class MealsUtil {
+    public static final List<Meal> MEAL_LIST = Arrays.asList(
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
+            new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
+    );
+
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        List<Meal> meals = Arrays.asList(
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
-                new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
-        );
+
 
         final LocalTime startTime = LocalTime.of(7, 0);
         final LocalTime endTime = LocalTime.of(12, 0);
 
-        List<MealTo> mealsTo = filteredByStreams(meals, startTime, endTime, 2000);
+        List<MealTo> mealsTo = filteredByStreams(MEAL_LIST, startTime, endTime, 2000);
         mealsTo.forEach(System.out::println);
 
-        System.out.println(filteredByCycles(meals, startTime, endTime, 2000));
+        System.out.println(filteredByCycles(MEAL_LIST, startTime, endTime, 2000));
 
 // Optional2 recursion
-        System.out.println(filteredByRecursion(meals, startTime, endTime, 2000));
+        System.out.println(filteredByRecursion(MEAL_LIST, startTime, endTime, 2000));
 //        System.out.println(filteredBySetterRecursion(meals, startTime, endTime, 2000));
 
 //  Optional2 reference type
@@ -63,8 +58,8 @@ public class MealsUtil {
 
     public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
-                .collect(
-                        Collectors.groupingBy(m->m.getDateTime().toLocalDate(), Collectors.summingInt(Meal::getCalories))
+                .collect(Collectors.groupingBy(m -> m.getDateTime().toLocalDate(),
+                        Collectors.summingInt(Meal::getCalories))
 //                      Collectors.toMap(Meal::getDate, Meal::getCalories, Integer::sum)
                 );
 
@@ -82,10 +77,19 @@ public class MealsUtil {
         final List<MealTo> mealsTo = new ArrayList<>();
         meals.forEach(meal -> {
             if (isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
-                mealsTo.add(createTo(meal, caloriesSumByDate.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
+                mealsTo.add(createTo(meal,
+                        caloriesSumByDate.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
             }
         });
         return mealsTo;
+    }
+
+    private static MealTo createTo(Meal meal, boolean excess) {
+        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+    }
+
+    public static List<MealTo> getWithExceeded(List<Meal> meals, int caloriesPerDay) {
+        return filteredByCycles(meals, LocalTime.MIN, LocalTime.MAX, caloriesPerDay);
     }
 
     private static List<MealTo> filteredByRecursion(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
@@ -347,7 +351,5 @@ public class MealsUtil {
         return values.stream().flatMap(identity()).collect(toList());
     }
 */
-    private static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
-    }
+
 }
