@@ -19,13 +19,11 @@ public class MealTo {
         this.calories = calories;
         this.excess = excess;
     }
-    public MealTo(LocalDateTime dateTime, String description, int calories, boolean excess){
-        this(null, dateTime, description, calories, excess);
-    }
 
     @Override
     public String toString() {
         return "MealTo{" +
+                "id=" + id +
                 "dateTime=" + dateTime +
                 ", description='" + description + '\'' +
                 ", calories=" + calories +

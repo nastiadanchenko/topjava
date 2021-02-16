@@ -34,7 +34,7 @@ public class MealsUtil {
     );
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        List<Meal> meals = Arrays.asList(
+        /*List<Meal> meals = Arrays.asList(
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
@@ -42,13 +42,13 @@ public class MealsUtil {
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
                 new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
-        );
+        );*/
 
         final LocalTime startTime = LocalTime.of(7, 0);
         final LocalTime endTime = LocalTime.of(12, 0);
 
-        List<MealTo> mealsTo = filteredByStreams(meals, startTime, endTime, 2000);
-        mealsTo.forEach(System.out::println);
+       /* List<MealTo> mealsTo = filteredByStreams(meals, startTime, endTime, 2000);
+        mealsTo.forEach(System.out::println);*/
 
         System.out.println(filteredByCycles(meals, startTime, endTime, 2000));
 
@@ -73,10 +73,29 @@ public class MealsUtil {
 //        System.out.println(filteredByCollector(meals, startTime, endTime, 2000));
     }
 
-    public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+    public static List<MealTo> filterByPredicate(Collection<Meal> meals, int caloriesPerDay, Predicate<Meal> filter) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(
-                        Collectors.groupingBy(m->m.getDateTime().toLocalDate(), Collectors.summingInt(Meal::getCalories))
+                        Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories)));
+
+        return meals.stream()
+                .filter(filter)
+                .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
+                .collect(Collectors.toList());
+    }
+
+    public static List<MealTo> getFilteredTos(Collection<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
+        return filterByPredicate(meals, caloriesPerDay, meal -> DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime));
+    }
+
+    public static List<MealTo> getTos(Collection<Meal> meals, int caloriesPerDay) {
+                return filterByPredicate(meals, caloriesPerDay, meal -> true);
+            }
+// переписали методом filterByPredicate
+    /*public static List<MealTo> filteredByStreams(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+        Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
+                .collect(
+                        Collectors.groupingBy(m -> m.getDateTime().toLocalDate(), Collectors.summingInt(Meal::getCalories))
 //                      Collectors.toMap(Meal::getDate, Meal::getCalories, Integer::sum)
                 );
 
@@ -84,7 +103,7 @@ public class MealsUtil {
                 .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime))
                 .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDateTime().toLocalDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
-    }
+    }*/
 
     public static List<MealTo> filteredByCycles(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
 
@@ -117,13 +136,11 @@ public class MealsUtil {
             result.add(createTo(meal, dailyCaloriesMap.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
         }
     }
+
     private static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+        return new MealTo(meal.getId(),meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 
-    public static List<MealTo> getTos(List<Meal> meals, int defaultCaloriesPerDay) {
-        return filteredByCycles(meals, LocalTime.MIN, LocalTime.MAX, defaultCaloriesPerDay);
-    }
 /*
     private static List<MealTo> filteredBySetterRecursion(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         class MealNode {
