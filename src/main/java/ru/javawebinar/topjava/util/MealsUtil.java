@@ -118,7 +118,11 @@ public class MealsUtil {
         }
     }
     private static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getId(),meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+    }
+
+    public static List<MealTo> getTos(List<Meal> meals, int defaultCaloriesPerDay) {
+        return filteredByCycles(meals, LocalTime.MIN, LocalTime.MAX, defaultCaloriesPerDay);
     }
 /*
     private static List<MealTo> filteredBySetterRecursion(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
