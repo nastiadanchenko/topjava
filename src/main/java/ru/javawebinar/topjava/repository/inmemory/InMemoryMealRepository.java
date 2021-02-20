@@ -6,12 +6,10 @@ import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.util.Util;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -33,8 +31,7 @@ public class InMemoryMealRepository implements MealRepository {
         // проверка на наличие объекта, чтобы не выскакивало исключение NullPointException
         Objects.requireNonNull(meal);
 
-        Map<Integer, Meal> userMeals = repository.computeIfAbsent(meal.getId(),
-                ConcurrentHashMap::new);
+        Map<Integer, Meal> userMeals = repository.computeIfPresent(meal.getId(), ConcurrentHashMap::new);
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
             userMeals.put(meal.getId(), meal);
@@ -58,7 +55,7 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Collection<Meal> getAll(int userId) {
+    public List<Meal> getAll(int userId) {
 
         return repository
                 .get(userId)
@@ -69,14 +66,14 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public Collection<Meal> getBetweenHalfOpen(LocalDateTime startDateTime,
-                                               LocalDateTime endDateTime, int userId) {
+    public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime,
+                                         LocalDateTime endDateTime, int userId) {
 
         return getAll(userId)
                 .stream()
-                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(),
+                .filter(meal -> Util.isBetweenHalfOpen(meal.getDateTime().toLocalTime(),
                         startDateTime.toLocalTime(), endDateTime.toLocalTime()))
-                .sorted(Comparator.comparing(Meal::getDateTime))
+                .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
     }
 }

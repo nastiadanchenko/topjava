@@ -77,10 +77,10 @@ public class MealsUtil {
     }
 
     public static List<MealTo> getFilteredTos(Collection<Meal> meals, int caloriesPerDay, LocalTime startTime, LocalTime endTime) {
-        return filterByPredicate(meals, caloriesPerDay, meal -> DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime));
+        return filterByPredicate(meals, caloriesPerDay, meal -> Util.isBetweenHalfOpen(meal.getTime(), startTime, endTime));
     }
 
-    public static List<MealTo> getTos(Collection<Meal> meals, int caloriesPerDay) {
+    public static List<MealTo> getTos(List<Meal> meals, int caloriesPerDay) {
                 return filterByPredicate(meals, caloriesPerDay, meal -> true);
             }
 // переписали методом filterByPredicate
@@ -104,7 +104,7 @@ public class MealsUtil {
 
         final List<MealTo> mealsTo = new ArrayList<>();
         meals.forEach(meal -> {
-            if (DateTimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
+            if (Util.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
                 mealsTo.add(createTo(meal, caloriesSumByDate.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
             }
         });
@@ -124,7 +124,7 @@ public class MealsUtil {
         Meal meal = meals.pop();
         dailyCaloriesMap.merge(meal.getDateTime().toLocalDate(), meal.getCalories(), Integer::sum);
         filterWithRecursion(meals, startTime, endTime, caloriesPerDay, dailyCaloriesMap, result);
-        if (DateTimeUtil.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
+        if (Util.isBetweenHalfOpen(meal.getDateTime().toLocalTime(), startTime, endTime)) {
             result.add(createTo(meal, dailyCaloriesMap.get(meal.getDateTime().toLocalDate()) > caloriesPerDay));
         }
     }
