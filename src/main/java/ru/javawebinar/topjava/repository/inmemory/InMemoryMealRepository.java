@@ -14,6 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepository.ADMIN_ID;
+import static ru.javawebinar.topjava.repository.inmemory.InMemoryUserRepository.USER_ID;
+
 @Repository
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, Map<Integer, Meal>> repository = new ConcurrentHashMap<>();
@@ -31,7 +34,7 @@ public class InMemoryMealRepository implements MealRepository {
         // проверка на наличие объекта, чтобы не выскакивало исключение NullPointException
         Objects.requireNonNull(meal);
 
-        Map<Integer, Meal> userMeals = repository.computeIfPresent(meal.getId(), ConcurrentHashMap::new);
+        /*Map<Integer, Meal> userMeals = usersMealsMap.computeIfAbsent(meal.getId(), ConcurrentHashMap::new);
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
             userMeals.put(meal.getId(), meal);

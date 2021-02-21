@@ -31,6 +31,7 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        // поднимаем контекст при запуске
         springContext = new ClassPathXmlApplicationContext("spring/spring-app.xml");
         mealController = springContext.getBean(MealRestController.class);
         //    repository = new InMemoryMealRepository();
@@ -77,13 +78,6 @@ public class MealServlet extends HttpServlet {
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
-            case "filter":
-                LocalDate startDate = DateTimeUtil.parsLocalDate(request.getParameter("startDate"));
-                LocalDate endDate =  DateTimeUtil.parsLocalDate(request.getParameter("endDate"));
-                LocalTime startTime = DateTimeUtil.parsLocalTime(request.getParameter("startTime"));
-                LocalTime endTime = DateTimeUtil.parsLocalTime(request.getParameter("endTime"));
-                request.setAttribute("meals", mealController.getBetweenHalfOpen(startDate, startTime, endDate, endTime));
-                request.getRequestDispatcher("/meals.jsp").forward(request, response);
             case "all":
             default:
                 log.info("getAll");
