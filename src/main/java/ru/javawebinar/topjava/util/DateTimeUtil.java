@@ -41,5 +41,15 @@ public class DateTimeUtil {
     LocalTime parsLocalTime(@Nullable String string) {
         return StringUtils.isEmpty(string) ? null : LocalTime.parse(string);
     }
+
+    public static @Nullable
+    LocalDate parseLocalDate(@Nullable String str) {
+        return StringUtils.hasLength(str) ? LocalDate.parse(str) : null;
+    }
+
+    public static @Nullable
+    LocalTime parseLocalTime(@Nullable String str) {
+        return StringUtils.hasLength(str) ? LocalTime.parse(str) : null;
+    }
 }
 
