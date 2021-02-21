@@ -46,18 +46,27 @@ public class InMemoryMealRepository implements MealRepository {
         }
         // handle case: update, but not present in storage
         return userMeals.computeIfPresent(meal.getId(), (id, oldId) -> meal);
+    */
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.computeIfAbsent(userId, uid -> new InMemoryBaseRepository<>());
+        return meals.save(meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
         /*Map<Integer, Meal> userMeals = usersMealsMap.get(userId);
         return userMeals != null && userMeals.remove(id) != null;
+    */
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.get(userId);
+        return meals != null && meals.delete(id);
     }
 
     @Override
     public Meal get(int id, int userId) {
         /*Map<Integer, Meal> userMeal = usersMealsMap.get(userId);
         return userMeal == null ? null : userMeal.get(id);
+    */
+        InMemoryBaseRepository<Meal> meals = usersMealsMap.get(userId);
+        return meals == null ? null : meals.get(id);
     }
 
     @Override
@@ -92,7 +101,7 @@ public class InMemoryMealRepository implements MealRepository {
 
     }
 
-    @Override
+  /*  @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime,
                                          LocalDateTime endDateTime, int userId) {
 
@@ -102,6 +111,6 @@ public class InMemoryMealRepository implements MealRepository {
                         startDateTime.toLocalTime(), endDateTime.toLocalTime()))
                 .sorted(Comparator.comparing(Meal::getDateTime).reversed())
                 .collect(Collectors.toList());
-    }
+    }*/
 }
 
