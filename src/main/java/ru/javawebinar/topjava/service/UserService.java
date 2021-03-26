@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -16,8 +17,8 @@ public class UserService {
 
     private final UserRepository repository;
 
-
-    public UserService(UserRepository repository) {
+    // добавила @Qualifier("dataJpaMealRepository")
+    public UserService(@Qualifier("dataJpaUserRepository") UserRepository repository) {
         this.repository = repository;
     }
 
