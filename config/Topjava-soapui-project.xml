@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <con:soapui-project activeEnvironment="Default" name="Topjava" resourceRoot="" soapui-version="5.6.0" abortOnError="false" runType="SEQUENTIAL" id="b6a174fe-9cda-4410-af25-bdf04e1fed39"
-                    xmlns:con="http://eviware.com/soapui/config">
+                    xmlns:con="http://eviware.com/soapui/config"> <!--    заигнорила URL-->
+
     <con:settings/>
     <con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="http://localhost:8080" type="rest" id="eebe6f3c-c045-444a-ae8f-c0f4bbb345b5"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -25,7 +26,8 @@
                     <con:mediaType>application/json</con:mediaType>
                     <con:status>200</con:status>
                     <con:params/>
-                    <con:element xmlns:ns="http://localhost/topjava/rest/admin/users/100000">ns:Response</con:element>
+<!--                    присвоила не понятный файл к ссылке-->
+                    <con:element xmlns:ns="http://localhost/topjava/rest/admin/users/100000">ns:Response</con:element> ns:Response
                 </con:representation>
                 <con:representation type="RESPONSE">
                     <con:mediaType>application/json;charset=UTF-8</con:mediaType>
@@ -235,6 +237,7 @@
                     <con:mediaType>application/json;charset=UTF-8</con:mediaType>
                     <con:status>200</con:status>
                     <con:params/>
+                    <!--    заигнорила URL-->
                     <con:element xmlns:prof="http://localhost/topjava/rest/profile">prof:Response</con:element>
                 </con:representation>
                 <con:request name="Get" mediaType="application/json" id="284adf4f-eb7e-44eb-83a9-b038a370efc4">
@@ -431,6 +434,7 @@
                     <con:mediaType>application/json;charset=UTF-8</con:mediaType>
                     <con:status>201</con:status>
                     <con:params/>
+                    <!--    заигнорила URL-->
                     <con:element xmlns:meal="http://localhost/topjava/rest/profile/meals">meal:Response</con:element>
                 </con:representation>
                 <con:request name="Create" id="17ccc2a1-4f1a-4715-afd3-e15984f11550" mediaType="application/json" postQueryString="false">
@@ -465,6 +469,7 @@
                     <con:mediaType>application/json;charset=UTF-8</con:mediaType>
                     <con:status>200</con:status>
                     <con:params/>
+                    <!--    заигнорила URL-->
                     <con:element xmlns:ns="http://localhost/topjava/rest/profile/meals/100002">ns:Response</con:element>
                 </con:representation>
                 <con:request name="Get" id="fbb9bd06-bbbb-4ebc-87d1-f3c79693fe77" mediaType="application/json">
