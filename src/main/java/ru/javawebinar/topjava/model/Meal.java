@@ -28,7 +28,8 @@ public class Meal extends AbstractBaseEntity {
     public static final String GET_BETWEEN = "Meal.getBetween";
 
     @Column(name = "date_time", nullable = false)
-    @NotNull
+    @NotNull(groups = {ValidatedUI.class, Default.class})
+    @JsonView(View.JsonREST.class)
     private LocalDateTime dateTime;
 
     @Column(name = "description", nullable = false)
