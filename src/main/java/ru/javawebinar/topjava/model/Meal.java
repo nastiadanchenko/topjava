@@ -41,8 +41,8 @@ public class Meal extends AbstractBaseEntity {
     private LocalDateTime dateTime;
 
     @Column(name = "description", nullable = false)
-    @NotBlank
-    @Size(min = 2, max = 120)
+    @NotBlank(groups = {ValidatedUI.class, Default.class})
+    @Size(min = 2, max = 120, groups = {ValidatedUI.class, Default.class})
     private String description;
 
     @Column(name = "calories", nullable = false)
@@ -54,7 +54,7 @@ public class Meal extends AbstractBaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonBackReference
-//    @NotNull
+    @NotNull(groups = View.Persist.class)
     private User user;
 
     public Meal() {

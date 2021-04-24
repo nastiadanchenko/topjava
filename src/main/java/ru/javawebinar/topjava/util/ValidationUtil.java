@@ -16,6 +16,14 @@ import java.util.stream.Collectors;
 public class ValidationUtil {
     private ValidationUtil() {
     }
+    public static <T> void validate(T bean, Class<?>... groups) {
+        // https://alexkosarev.name/2018/07/30/bean-validation-api/
+
+        Set<ConstraintViolation<T>> violations = validator.validate(bean, groups);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+    }
 
     public static <T> T checkNotFoundWithId(T object, int id) {
         checkNotFoundWithId(object != null, id);
